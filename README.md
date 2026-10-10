@@ -3,13 +3,16 @@
 Tünele girerken far açmayı unutmak, akşam üstü gölgeli yolda farsız ilerlemek, sabah güneş doğduktan sonra farları kapatmayı akıl edememek… Hepimizin başına geldi. Üstelik her aracın otomatik far sistemi yok, olanların da ayarı genelde sabit.
 
 
+![Splash](https://blog.yakupulutas.com/wp-content/uploads/2026/10/image-1024x658.png)
+
+
 Bu yüzden kendi otomatik far sistemimi yapmıştım yıllar önce o yazıyı buradan okuyabilirsiniz şimdi projeyi bir üst seviyeye taşıdım.
 Bir Arduino Nano, bir LDR (ışığa duyarlı direnç) ve küçük bir OLED ekran. Sistem ortam ışığını ölçüyor, park lambasını, kısa farı ve gündüz farını (DRL) kendisi yönetiyor. Eşiklerin, gecikmelerin ve parlaklıkların hepsi cihazın kendi menüsünden ayarlanabiliyor.
 
 
 Bu yazıda sistemin nasıl çalıştığını, ekranda gördüklerini ve menüdeki her ayarın ne işe yaradığını anlatıyorum.
 
-
+![Splash](https://blog.yakupulutas.com/wp-content/uploads/2026/10/image-6-768x485.png)
 ## Proje ne yapıyor?
 Ortam karardıkça önce park lambasını, daha da kararınca kısa farı yakar.
 Işık geri gelince farları, kısa süreli gölgelerde yanıp sönmesinler diye bir bekleme süresinin ardından söndürür.
@@ -17,6 +20,9 @@ Gündüz farını (DRL) sabit bırakmaz. Ortam ışığına göre parlaklığın
 Tünel gibi ani karanlıklarda beklemeden devreye girer.
 Marş sırasında farları kapalı tutan bir mars gecikmesi vardır.
 Tüm ayarlar ekrandaki menüden yapılır ve cihaza kaydedilir.
+
+
+[![Otomatik Far Sensörü](https://img.youtube.com/vi/GgLcV_yzKG8/0.jpg)](https://youtube.com/shorts/GgLcV_yzKG8)
 
 ## Sistem nasıl karar veriyor?
 ### LDR ve ışık değeri
