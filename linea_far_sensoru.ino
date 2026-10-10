@@ -12,7 +12,7 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // --- PIN TANIMLARI ---
-const uint8_t PIN_BTN_UP  = 8; // K1'in pini (D2 bozuk olduğu için D8'e alındı)
+const uint8_t PIN_BTN_UP  = 8; // K1'in pini 
 const uint8_t PIN_BTN_DWN = 3; // K2'nin pini
 const uint8_t PIN_BTN_OK  = 4;
 const uint8_t PIN_BTN_BCK = 9;
