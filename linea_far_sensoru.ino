@@ -12,7 +12,7 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // --- PIN TANIMLARI ---
-const uint8_t PIN_BTN_UP  = 8; // K1'in pini 
+const uint8_t PIN_BTN_UP  = 8; // K1'in pini (D2 bozuk olduğu için D8'e alındı)
 const uint8_t PIN_BTN_DWN = 3; // K2'nin pini
 const uint8_t PIN_BTN_OK  = 4;
 const uint8_t PIN_BTN_BCK = 9;
@@ -154,6 +154,7 @@ int ldrAcc = 500 << 4;          // Filtre durumu (x16 hassasiyet)
 bool parkActive = false;
 bool kisaActive = false;
 uint8_t currentPwm = 0;
+uint8_t rawPwm = 0;
 
 unsigned long tParkDarkStart = 0;
 unsigned long tParkLightStart = 0;
@@ -267,7 +268,7 @@ void updateSensor(unsigned long now) {
 
 // --- DRL: ORTAM IŞIĞINA GÖRE YUMUŞAK PARLAKLIK ---
 unsigned long lastPwmStep = 0;
-const unsigned long DRL_STEP_MS = 10;
+const unsigned long DRL_STEP_MS = 7; // Her adim 7 ms -> 0'dan 255'e tam donanim cozunurlugunde ~1.8 saniyede zarif fade-in
 
 uint8_t computeDrlTarget() {
   if (kisaActive) return config.drlKisaPwm;
@@ -281,10 +282,15 @@ uint8_t computeDrlTarget() {
 void updateDrlPwm(unsigned long now) {
   if (now - lastPwmStep < DRL_STEP_MS) return;
   lastPwmStep = now;
-  uint8_t target = computeDrlTarget();
-  if (currentPwm < target) currentPwm++;
-  else if (currentPwm > target) currentPwm--;
-  analogWrite(PIN_PWM, map(currentPwm, 0, 100, 0, 255));
+
+  uint8_t targetPercent = computeDrlTarget();
+  uint8_t targetRaw = map(targetPercent, 0, 100, 0, 255);
+
+  if (rawPwm < targetRaw) rawPwm++;
+  else if (rawPwm > targetRaw) rawPwm--;
+
+  analogWrite(PIN_PWM, rawPwm);
+  currentPwm = (uint8_t)(((uint16_t)rawPwm * 100 + 127) / 255);
 }
 
 // --- FAR MANTIĞI ---
@@ -295,6 +301,7 @@ void processLights(unsigned long now) {
     kisaActive = false;
     tParkDarkStart = tParkLightStart = tKisaDarkStart = tKisaLightStart = 0;
     currentPwm = 0;
+    rawPwm = 0;
     digitalWrite(PIN_PARK, LOW);
     digitalWrite(PIN_KISA, LOW);
     analogWrite(PIN_PWM, 0);
@@ -304,6 +311,7 @@ void processLights(unsigned long now) {
   if (now < (unsigned long)config.bootDelaySec * 1000UL) {
     // Mars Gecikmesi suresince farlari kapali tut
     currentPwm = 0;
+    rawPwm = 0;
     digitalWrite(PIN_PARK, LOW);
     digitalWrite(PIN_KISA, LOW);
     analogWrite(PIN_PWM, 0);
@@ -931,13 +939,6 @@ void setup() {
   // -------------------------
 
   initSensors();
-  uint8_t startPwm = computeDrlTarget();
-  for (int pwm = 0; pwm <= startPwm; pwm += 2) {
-    analogWrite(PIN_PWM, map(pwm, 0, 100, 0, 255));
-    delay(15);
-  }
-  currentPwm = startPwm;
-  analogWrite(PIN_PWM, map(currentPwm, 0, 100, 0, 255));
 }
 
 // ================= EKRAN KORUYUCU (yanma korumalı) =================
